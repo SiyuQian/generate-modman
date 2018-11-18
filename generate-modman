@@ -6,7 +6,8 @@ GREEN="\033[0;32m"
 NONE="\033[0m"
 
 # declare all default directories
-declare -a directories=( 'app/code' 'app/etc' 'app/locale' 'app/design' js lib media skin shell var)
+declare -a directories=( 'app/code' 'app/etc' 'app/locale' 'app/design' js lib media skin shell var develop)
+declare -a files=( 'gulpfile.js' '.gitignore' 'package.json')
 
 include_others=0
 include_others_files=0
@@ -100,6 +101,10 @@ function handle_media() {
     _default_file_handler media
 }
 
+function handle_develop() {
+    _default_file_handler develop
+}
+
 function handle_skin() {
     # link all directories who aren't default
     find skin -mindepth 2 -maxdepth 2 \( ! -path "*frontend/rwd*" ! -path "*frontend/default*" ! -path "*frontend/base*" ! -path "*adminhtml/default*" ! -path "*adminhtml/base*" ! -path "*install/default*" \) -type d
@@ -152,3 +157,10 @@ if [ $include_others_files -eq 1 ]; then
     echo "# others (--include-others-files)" >> $modman
     find * ! -iname "modman" ! -iname "composer.json" ! -iname ".gitignore" -mindepth $include_others_files_mindepth \( ! -path "app/*" ! -path "js/*" ! -path "lib/*" ! -path "media/*" ! -path "skin/*" ! -path "shell/*" ! -path "var/*" \) -type f | awk -v prefix="$prefix" '{ print prefix$0 "            " $0 }' >> $modman
 fi
+
+for file in "${files[@]}"; do
+    if [ -e "$file" ]; then
+        echo "# ${file}" >> $modman
+        echo "${file}             ${file}" >> $modman
+    fi
+done
